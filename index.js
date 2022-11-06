@@ -1,15 +1,17 @@
+const fs = require('fs/promises');
 const rp = require('request-promise-native');
 
-const dataFile = process.argv[2];
-
-const runners = require(dataFile);
-
-if (!runners) {
-  console.err('Please provie a valid runner file as the first argument!');
-  return;
-}
-
 (async () => {
+
+  const dataFile = process.argv[2];
+  
+  const runners = JSON.parse(await fs.readFile(dataFile, { encoding: 'utf8' }));
+  
+  if (!runners) {
+    console.err('Please provie a valid runner file as the first argument!');
+    return;
+  }
+  
   const rankPromises = runners.map(getRunnerRankings);
 
   const ranks = (await Promise.all(rankPromises));
@@ -17,10 +19,12 @@ if (!runners) {
   const result = ranks
     .map(response => JSON.parse(response))
     .reduce((acc, val) => (acc || []).concat(val))
-    .map(runner => ({ first: runner.FirstName, last: runner.LastName, rank: runner.Rank*100, results: runner.Results && runner.Results.length || 0 }))
+    .map(runner => ({ first: runner.FirstName, last: runner.LastName, rank: Math.round(runner.Rank*10000)/100, results: runner.Results && runner.Results.length || 0 }))
     .sort((x, y) => y.rank - x.rank);
 
-  console.log(JSON.stringify(result));
+  result.forEach(({first, last, rank, results}) => {
+    console.log(`${rank.toFixed(2)} (${`  ${results}`.substr(-3)}) ${first} ${last}`);
+  });
 })();
 
 async function getRunnerRankings(runner) {
