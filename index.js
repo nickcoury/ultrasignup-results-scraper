@@ -23,7 +23,7 @@ const rp = require('request-promise-native');
     .sort((x, y) => y.rank - x.rank);
 
   result.forEach(({first, last, rank, results}) => {
-    console.log(`${rank.toFixed(2)} (${`  ${results}`.substr(-3)}) ${first} ${last}`);
+    console.log(`${rank.toFixed(2)} (${`  ${results}`.substr(-3)}) ${first.trim()} ${last.trim()}`);
   });
 })();
 

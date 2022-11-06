@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "runsignup": "ts-node ./runsignup.ts",
+    "ultrasignup": "node index.js ./data/2022-11-06_hoka-bandera-endurance-trail-race.json"
   },
   "author": "Nick Coury",
   "license": "MIT",
   "dependencies": {
-    "request-promise-native": "^1.0.9"
+    "puppeteer": "^19.2.2",
+    "request-promise-native": "^1.0.9",
+    "ts-node": "^10.9.1"
   }
 }
