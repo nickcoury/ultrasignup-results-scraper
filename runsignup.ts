@@ -9,8 +9,13 @@ async function run() {
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  const allNames: string[] = [];
+  const runners: any[] = [];
+  let pageRunners: any[] = [];
   let pageNames: string[];
+  let pageGenders: string[];
+  let pageAges: string[];
+  let pageCities: string[];
+  let pageStates: string[];
   let pageNumber = 1;
   let finished = false;
 
@@ -19,7 +24,21 @@ async function run() {
     console.log(`Getting page ${pageNumber}`);
     await page.goto(url);
     pageNames = await page.$$eval('table.data-display2 span.name', els => els.map(el => el?.textContent?.trim() || ''));
-    allNames.push(...pageNames);
+    pageRunners = pageNames.map(name => ({ first: name.split(' ')[0], last: name.split(' ').slice(1).join(' ')}));
+    pageGenders = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(4)', els => els.map(el => el?.textContent?.trim() || ''));
+    pageAges = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(5)', els => els.map(el => el?.textContent?.trim() || ''));
+    pageCities = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(6)', els => els.map(el => el?.textContent?.trim().replace(/\s+/g, ', ') || ''));
+    pageStates = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(7)', els => els.map(el => el?.textContent?.trim().replace(/\s+/g, ', ') || ''));
+    pageRunners.forEach((runner, i) => {
+      let age: number = Number(pageAges[i]);
+      if (age > 0) {
+        runner.age = age;
+      }
+      runner.gender = pageGenders[i];
+      runner.city = pageCities[i];
+      runner.state = pageStates[i];
+    });
+    runners.push(...pageRunners);
     pageNumber++;
 
     const currentPage = await page.$eval('div.showing-page input', el => (el as any)?.placeholder);
@@ -31,8 +50,13 @@ async function run() {
 
   await browser.close();
 
-  const runners = allNames.map(name => ({ first: name.split(' ')[0], last: name.split(' ').slice(1).join(' ')}))
-
   const filename = `./data/${(new Date().toISOString()).substring(0, 10)}_${raceName}.json`;
   await fsPromises.writeFile(filename, JSON.stringify(runners, undefined, 2));
+  
+  const csvFileContents = `"First","Last","Age","Gender","City","State"\n` + runners
+    .map(runner => [runner.first, runner.last, runner.age, runner.gender, runner.city, runner.state])
+    .map(entries => entries.map(x => `"${x || ''}"`).join(','))
+    .join(`\n`);
+  const csvFilename = `./data/${(new Date().toISOString()).substring(0, 10)}_${raceName}.csv`;
+  await fsPromises.writeFile(csvFilename, csvFileContents);
 }
