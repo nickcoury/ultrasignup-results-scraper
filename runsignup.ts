@@ -20,15 +20,15 @@ async function run() {
   let finished = false;
 
   do {
-    const url = `https://runsignup.com/Race/FindARunner/?search=&eventId=611088&raceId=76530&perPage=50&page=${pageNumber}`;
+    const url = `https://runsignup.com/Race/FindARunner/?search=&eventId=648412&raceId=136443&perPage=50&page=${pageNumber}`;
     console.log(`Getting page ${pageNumber}`);
     await page.goto(url);
     pageNames = await page.$$eval('table.data-display2 span.name', els => els.map(el => el?.textContent?.trim() || ''));
     pageRunners = pageNames.map(name => ({ first: name.split(' ')[0], last: name.split(' ').slice(1).join(' ')}));
-    pageGenders = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(4)', els => els.map(el => el?.textContent?.trim() || ''));
-    pageAges = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(5)', els => els.map(el => el?.textContent?.trim() || ''));
-    pageCities = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(6)', els => els.map(el => el?.textContent?.trim().replace(/\s+/g, ', ') || ''));
-    pageStates = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(7)', els => els.map(el => el?.textContent?.trim().replace(/\s+/g, ', ') || ''));
+    pageGenders = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(5)', els => els.map(el => el?.textContent?.trim() || ''));
+    pageAges = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(6)', els => els.map(el => el?.textContent?.trim() || ''));
+    pageCities = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(7)', els => els.map(el => el?.textContent?.trim().replace(/\s+/g, ', ') || ''));
+    pageStates = await page.$$eval('table.data-display2 tbody > tr > td:nth-child(8)', els => els.map(el => el?.textContent?.trim().replace(/\s+/g, ', ') || ''));
     pageRunners.forEach((runner, i) => {
       let age: number = Number(pageAges[i]);
       if (age > 0) {

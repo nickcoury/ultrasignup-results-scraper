@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "runsignup": "ts-node ./runsignup.ts",
-    "ultrasignup": "node index.js ./data/2023-01-01_hoka-bandera-endurance-trail-race.json"
+    "ultrasignup": "node index.js ./data/2023-01-08_lake-sonoma.json"
   },
   "author": "Nick Coury",
   "license": "MIT",
